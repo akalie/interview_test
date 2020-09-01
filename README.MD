@@ -1,5 +1,5 @@
 Result code usage example [link to new code](./app2.php)
-
+Please note that ExchangeratesapiCurrencyProvider and BinlistBinLookup use simple array cache, so it is probably better not use this classes in long run services (if it is the case, I'd create a service for caching that data in background once a while(redis/db), and use this cache in calculation)
 
 # Situation
 

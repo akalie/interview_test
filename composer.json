@@ -1,0 +1,24 @@
+{
+    "name": "akalie/interview_test_mariusbalcytis",
+    "authors": [
+        {
+            "name": "askaslie",
+            "email": "askaslie@gmail.com"
+        }
+    ],
+    "autoload": {
+        "psr-4": {
+            "blabla\\": "src/"
+        }
+    },
+    "require": {
+        "php": "^7.4",
+        "ext-json": "*",
+        "guzzlehttp/guzzle": "^7.0"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "^9.3",
+        "phpstan/phpstan": "^0.12.40",
+        "vimeo/psalm": "^3.14"
+    }
+}

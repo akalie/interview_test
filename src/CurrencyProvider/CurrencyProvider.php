@@ -6,5 +6,5 @@ namespace blabla\CurrencyProvider;
 
 interface CurrencyProvider
 {
-    public function getCurrencyRate(string $currencyName): ?float;
+    public function getCurrencyRate(string $currencyName): float;
 }

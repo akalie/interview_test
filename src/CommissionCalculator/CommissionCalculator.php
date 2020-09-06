@@ -4,9 +4,7 @@
 namespace blabla\CommissionCalculator;
 
 
-use blabla\TransactionInfo;
-
 interface CommissionCalculator
 {
-    public function calculate(TransactionInfo $transaction): float;
+    public function calculate(float $amount, string $countryName): float;
 }

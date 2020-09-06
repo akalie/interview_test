@@ -13,6 +13,9 @@ use PHPUnit\Framework\TestCase;
 class SimpleCommissionCalculatorTest extends TestCase
 {
 
+    const EUROPE_COMMISSION_RATE_DUMMY = 0.01;
+    const NON_EUROPE_COMMISSION_RATE_DUMMY = 0.02;
+
     public function isEuropeCountryCheckProvider(): array
     {
         return [
@@ -27,8 +30,8 @@ class SimpleCommissionCalculatorTest extends TestCase
     public function testIsEuropeCountryCheck(string $country, bool $result)
     {
         $calculator = new SimpleCommissionCalculator(
-            $this->createMock(BinLookup::class),
-            $this->createMock(CurrencyProvider::class),
+            self::EUROPE_COMMISSION_RATE_DUMMY,
+            self::NON_EUROPE_COMMISSION_RATE_DUMMY
         );
 
         $this->assertEquals($result, $calculator->isEuropeCountry($country));
@@ -37,8 +40,8 @@ class SimpleCommissionCalculatorTest extends TestCase
     public function commissionMultiplierCalculatingProvider(): array
     {
         return [
-            ['BG', SimpleCommissionCalculator::EUROPE_COMMISSION_MULTIPLIER],
-            ['BY', SimpleCommissionCalculator::NON_EUROPE_COMMISSION_MULTIPLIER],
+            ['BG', self::EUROPE_COMMISSION_RATE_DUMMY],
+            ['BY', self::NON_EUROPE_COMMISSION_RATE_DUMMY],
         ];
     }
 
@@ -48,8 +51,8 @@ class SimpleCommissionCalculatorTest extends TestCase
     public function testCommissionMultiplierCalculating(string $country, float $result)
     {
         $calculator = new SimpleCommissionCalculator(
-            $this->createMock(BinLookup::class),
-            $this->createMock(CurrencyProvider::class)
+            self::EUROPE_COMMISSION_RATE_DUMMY,
+            self::NON_EUROPE_COMMISSION_RATE_DUMMY
         );
 
         $this->assertEquals($result, $calculator->getCommissionMultiplier($country));
@@ -76,8 +79,8 @@ class SimpleCommissionCalculatorTest extends TestCase
     public function testCeiling(float $expected, float $dataToCeil)
     {
         $calculator = new SimpleCommissionCalculator(
-            $this->createMock(BinLookup::class),
-            $this->createMock(CurrencyProvider::class)
+            self::EUROPE_COMMISSION_RATE_DUMMY,
+            self::NON_EUROPE_COMMISSION_RATE_DUMMY
         );
 
         $this->assertEquals($expected, $calculator->ceil($dataToCeil));
@@ -91,33 +94,28 @@ class SimpleCommissionCalculatorTest extends TestCase
         return [
             [
                 'expectedResult' => 1,
-                'binData' => 'DK',
-                'currencyData' => 7.4439,
-                'transactionData' => ['bin' => 45717360, 'amount' => 100.00,'currency' => 'EUR'],
+                'amount' => 100.00,
+                'countryName' => 'DK',
             ],
             [
                 'expectedResult' => 0.41876046901173,
-                'binData' => 'LT',
-                'currencyData' => 1.194,
-                'transactionData' => ['bin' => 516793, 'amount' => 50.00,'currency' => 'USD'],
+                'amount' => 41.8760469012,
+                'countryName' => 'LT',
             ],
             [
                 'expectedResult' => 1.5814027041986,
-                'binData' => 'JP',
-                'currencyData' => 126.47,
-                'transactionData' => ['bin' => 45417360, 'amount' => 10000.00,'currency' => 'JPY'],
+                'amount' => 79.0701352099,
+                'countryName' => 'JP',
             ],
             [
                 'expectedResult' => 2.177554438861,
-                'binData' => 'US',
-                'currencyData' => 1.194,
-                'transactionData' => ['bin' => 41417360, 'amount' => 130.00,'currency' => 'USD'],
+                'amount' => 108.877721943,
+                'countryName' => 'US',
             ],
             [
                 'expectedResult' => 44.640366051002,
-                'binData' => 'GB',
-                'currencyData' => 0.89605,
-                'transactionData' => ['bin' => 4745030, 'amount' => 2000.00,'currency' => 'GBP'],
+                'amount' => 2232.01830255,
+                'countryName' => 'GB',
             ],
         ];
     }
@@ -125,19 +123,17 @@ class SimpleCommissionCalculatorTest extends TestCase
     /**
      * @dataProvider commissionCalculationProvider
      */
-    public function testCommissionCalculation($expected, $binData, $currencyData, array $transactionData)
+    public function testCommissionCalculation($expected, $amount, $countryName)
     {
-        $binLookupStub = $this->createMock(BinLookup::class);
-        $binLookupStub->method('getCountryNameByBin')->willReturn($binData);
-        $currencyStub = $this->createMock(CurrencyProvider::class);
-        $currencyStub->method('getCurrencyRate')->willReturn($currencyData);
-        $transaction = new TransactionInfo(...array_values($transactionData));
+        $calculator = new SimpleCommissionCalculator(
+            self::EUROPE_COMMISSION_RATE_DUMMY,
+            self::NON_EUROPE_COMMISSION_RATE_DUMMY
+        );
 
-        $calculator = new SimpleCommissionCalculator($binLookupStub, $currencyStub);
 
         $this->assertEquals(
             $expected,
-            $calculator->calculate($transaction)
+            $calculator->calculate($amount, $countryName)
         );
     }
 }

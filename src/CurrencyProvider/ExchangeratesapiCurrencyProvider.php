@@ -36,7 +36,7 @@ class ExchangeratesapiCurrencyProvider implements CurrencyProvider
             );
         }
 
-        return (float) $list[$currencyName];
+        return (float)$list[$currencyName];
     }
 
     /**
